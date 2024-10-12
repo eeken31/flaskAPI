@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+            <h2 class="text-3xl font-bold text-center text-gray-700">Dashboard</h2>
+            <p class="text-center text-gray-600 mb-6">Choose an option below</p>
+
+            <!-- Buttons Section -->
+            <div class="grid grid-cols-1 gap-4">
+                <!-- Logout Button -->
+                    <a href="{{ url_for('logout') }}" class="w-full px-4 py-2 text-white text-center bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Logout
+                    </a>
+
+                <!-- Report Button -->
+                    <a href="{{ url_for('report') }}" class="w-full px-4 py-2 text-white text-center bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Report
+                    </a>
+
+                <!-- Query Button -->
+                    <a href="{{ url_for('query') }}" class="w-full px-4 py-2 text-white text-center bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        Query
+                    </a>
+
+                <!-- Transaction Button -->
+                    <a href="{{ url_for('transaction') }}" class="w-full px-4 py-2 text-white text-center bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        Transaction
+                    </a>
+
+                <!-- Client Button -->
+                    <a href="{{ url_for('client') }}" class="w-full px-4 py-2 text-white text-center bg-yellow-600 rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                        Client
+                    </a>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
