@@ -10,11 +10,15 @@ logging.basicConfig(level=logging.ERROR)
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
+
+#no homepage
 @app.route("/")
 @app.route("/index")
 def index():
 	return render_template("login.html")
 
+
+#login logic
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
@@ -26,7 +30,7 @@ def login():
 			token = response.json()['token']
 			session['token'] = token
 
-			# Set the session to expire in 10 minutes (token lifespan)
+			# Set the session to expire in 10 minutes
 			session['expires_at'] = datetime.now() + timedelta(minutes=10)
 
 			return redirect(url_for('dashboard'))
@@ -34,26 +38,33 @@ def login():
 			flash("Invalid email or password")
 	return render_template('login.html')
 
+
+#login requirement
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = session.get('token')
         expires_at = session.get('expires_at')
 
-        # Ensure both times are timezone-aware for proper comparison
+       	# Compare time for token expiration
         if not token or not expires_at or datetime.now(timezone.utc) > expires_at:
             flash("Your session has expired. Please log in again.")
-            session.clear()  # Clear the session
+            session.clear()
             return redirect(url_for('login'))
 
         return f(*args, **kwargs)
     return decorated_function
 
+
+#dashboard
 @app.route("/dashboard")
 @login_required
 def dashboard():
 	return render_template("dashboard.html")
 
+
+
+#Transaction Report logic
 @app.route("/report", methods=['GET', 'POST'])
 @login_required
 def report():
@@ -63,6 +74,7 @@ def report():
 		flash("Your session has expired. Please log in again.")
 		return redirect(url_for('login'))
 
+	#parameter collection
 	if request.method == 'POST':
 		fromDate = request.form.get('date-from', '').strip()
 		toDate = request.form.get('date-to', '').strip()
@@ -77,7 +89,7 @@ def report():
 			'fromDate': fromDate,
 			'toDate': toDate
 		}
-
+		#dynamic parameters
 		if merchant:
 			query_params['merchant'] = merchant
 		if acquirer:
@@ -86,10 +98,12 @@ def report():
 		query_string = urlencode(query_params)
 		url = f"https://sandbox-reporting.rpdpymnt.com/api/v3/transactions/report?{query_string}"
 
+		#token
 		headers = {
 			'Authorization': token
 		}
 
+		#api call and minor error handling
 		try:
 			response = requests.post(url, headers=headers)
 
@@ -107,6 +121,8 @@ def report():
 
 	return render_template("report.html")
 
+
+#Transaction Query logic
 @app.route("/query", methods=['GET', 'POST'])
 @login_required
 def query():
@@ -116,6 +132,7 @@ def query():
 		flash("Your session has expired. Please log in again.")
 		return redirect(url_for('login'))
 
+	# parameter collection
 	if request.method == 'POST':
 		fromDate = request.form.get('fromDate', '').strip()
 		toDate = request.form.get('toDate', '').strip()
@@ -129,6 +146,7 @@ def query():
 		filterValue = request.form.get('filterValue', '').strip()
 		page = request.form.get('page', '').strip()
 
+		# dynamic parameters
 		query_params = {}
 		if fromDate:
 			query_params['fromDate'] = fromDate
@@ -160,6 +178,7 @@ def query():
 			'Authorization': token
 		}
 
+		# api call and minor error handling
 		try:
 			response = requests.post(url, headers=headers)
 
@@ -177,6 +196,9 @@ def query():
 
 	return render_template("query.html")
 
+
+#PROVIDED CREDENTIALS ARE UNAUTHORISED FOR TRANSACTION OR CLIENT API CALLS. UNTESTED, MIGHT NOT BE WORKING AS INTENDED.
+#Get Transaction logic
 @app.route("/transaction", methods=['GET', 'POST'])
 @login_required
 def transaction():
@@ -189,6 +211,7 @@ def transaction():
 	error = None
 	data = None
 
+	#parameter collection
 	if request.method == 'POST':
 		transaction_id = request.form.get('transaction-id')
 
@@ -201,7 +224,7 @@ def transaction():
 		headers = {
 			'Authorization': token
 		}
-
+		#api call with different error handling, because of unauthorised credentials
 		try:
 			response = requests.post(url, headers=headers)
 
@@ -223,6 +246,9 @@ def transaction():
 
 	return render_template("transaction.html")
 
+
+#PROVIDED CREDENTIALS ARE UNAUTHORISED FOR TRANSACTION OR CLIENT API CALLS. UNTESTED, MIGHT NOT BE WORKING AS INTENDED.
+#Get Client logic
 @app.route("/client", methods=['GET', 'POST'])
 @login_required
 def client():
@@ -243,7 +269,7 @@ def client():
 		headers = {
 			'Authorization': token
 		}
-
+		# api call with different error handling, because of unauthorised credentials
 		try:
 			response = requests.post(url, headers=headers)
 
@@ -270,6 +296,8 @@ def client():
 
 	return render_template("client.html")
 
+
+#Logout logic, clears session
 @app.route('/logout')
 def logout():
 	session.clear()
