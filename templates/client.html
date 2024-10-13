@@ -12,11 +12,24 @@
         <div class="w-full max-w-lg p-8 space-y-6 bg-white rounded-lg shadow-md">
             <h2 class="text-2xl font-bold text-center text-gray-700">Check Client</h2>
 
+            <!-- Flash messages for success/error feedback -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div>
+                        {% for category, message in messages %}
+                            <div class="text-center text-{{ 'red' if category == 'error' else 'green' }}-600">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
             <!-- Transaction ID Form -->
-            <form class="space-y-6" action="/check-client" method="POST">
+            <form class="space-y-6" action="{{ url_for('client') }}" method="POST">
                 <!-- Transaction ID (mandatory) -->
                 <div>
-                    <label for="transaction-id" class="block text-sm font-medium text-gray-700">Transaction ID <span class="text-red-500">*</span></label>
+                    <label for="transaction-id" class="block text-sm font-medium text-gray-700" aria-label="Transaction ID">Transaction ID <span class="text-red-500">*</span></label>
                     <input type="text" name="transaction-id" id="transaction-id" required
                            class="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                            placeholder="Enter Transaction ID">
@@ -26,7 +39,7 @@
                 <div>
                     <button type="submit"
                             class="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Check Transaction
+                        Check Client
                     </button>
                 </div>
 

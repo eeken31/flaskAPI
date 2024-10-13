@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Information</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-lg p-8 space-y-6 bg-white rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-center text-gray-700">Client Information</h2>
+
+            <!-- Display Customer Info -->
+            <div class="mt-6">
+                {% if customerInfo %}
+                    <div class="bg-gray-100 p-4 rounded-lg shadow-sm">
+                        <h3 class="text-lg font-semibold text-gray-900">Customer Details</h3>
+                        <p class="text-gray-700">Customer ID: {{ customerInfo.id }}</p>
+                        <p class="text-gray-700">Created At: {{ customerInfo.created_at }}</p>
+                        <p class="text-gray-700">Updated At: {{ customerInfo.updated_at }}</p>
+                        <p class="text-gray-700">Card Number: {{ customerInfo.number }}</p>
+                        <p class="text-gray-700">Expiry: {{ customerInfo.expiryMonth }}/{{ customerInfo.expiryYear }}</p>
+                        <p class="text-gray-700">Email: {{ customerInfo.email }}</p>
+                        <p class="text-gray-700">Birthday: {{ customerInfo.birthday }}</p>
+
+                        <h3 class="text-lg font-semibold text-gray-900 mt-4">Billing Information</h3>
+                        <p class="text-gray-700">Name: {{ customerInfo.billingFirstName }} {{ customerInfo.billingLastName }}</p>
+                        <p class="text-gray-700">Address: {{ customerInfo.billingAddress1 }}, {{ customerInfo.billingCity }}, {{ customerInfo.billingCountry }} - {{ customerInfo.billingPostcode }}</p>
+                        <p class="text-gray-700">Phone: {{ customerInfo.billingPhone }}</p>
+
+                        <h3 class="text-lg font-semibold text-gray-900 mt-4">Shipping Information</h3>
+                        <p class="text-gray-700">Name: {{ customerInfo.shippingFirstName }} {{ customerInfo.shippingLastName }}</p>
+                        <p class="text-gray-700">Address: {{ customerInfo.shippingAddress1 }}, {{ customerInfo.shippingCity }}, {{ customerInfo.shippingCountry }} - {{ customerInfo.shippingPostcode }}</p>
+                        <p class="text-gray-700">Phone: {{ customerInfo.shippingPhone }}</p>
+                    </div>
+                {% else %}
+                    <p class="text-center text-gray-600">No client information available.</p>
+                {% endif %}
+            </div>
+
+            <!-- Back to Dashboard Button -->
+            <div class="flex flex-col items-center">
+                <a href="{{ url_for('dashboard') }}" class="w-full px-4 py-2 text-white text-center bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
