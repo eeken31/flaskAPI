@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-6xl p-8 space-y-6 bg-white rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-center text-gray-700">Query Results</h2>
+
+            <!-- Pagination Info -->
+            <div class="mt-6">
+                <p class="text-gray-700"><strong>Per Page:</strong> {{ data.per_page }}</p>
+                <p class="text-gray-700"><strong>Current Page:</strong> {{ data.current_page }}</p>
+                <p class="text-gray-700"><strong>From:</strong> {{ data.from }}</p>
+                <p class="text-gray-700"><strong>To:</strong> {{ data.to }}</p>
+
+                <!-- Previous and Next Page Links -->
+                <div class="mt-4">
+                    {% if data.prev_page_url %}
+                        <a href="{{ data.prev_page_url }}" class="text-indigo-600 hover:underline">Previous Page</a>
+                    {% endif %}
+                    {% if data.next_page_url %}
+                        <a href="{{ data.next_page_url }}" class="ml-4 text-indigo-600 hover:underline">Next Page</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Display Transaction Data -->
+            <div class="mt-6 overflow-x-auto">
+                <table class="w-full table-auto">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="px-4 py-2 text-left text-gray-700">FX</th>
+                            <th class="px-4 py-2 text-left text-gray-700">Customer Info</th>
+                            <th class="px-4 py-2 text-left text-gray-700">Merchant</th>
+                            <th class="px-4 py-2 text-left text-gray-700">Transaction</th>
+                            <th class="px-4 py-2 text-left text-gray-700">Acquirer</th>
+                            <th class="px-4 py-2 text-left text-gray-700">Refundable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if data.data %}
+                            {% for item in data.data %}
+                            <tr class="bg-white">
+                                <td class="border px-4 py-2">{{ item.fx }}</td>
+                                <td class="border px-4 py-2">
+                                    <p><strong>Name:</strong> {{ item.customerInfo.name }}</p>
+                                    <p><strong>Email:</strong> {{ item.customerInfo.email }}</p>
+                                    <p><strong>Phone:</strong> {{ item.customerInfo.phone }}</p>
+                                </td>
+                                <td class="border px-4 py-2">{{ item.merchant.name }}</td>
+                                <td class="border px-4 py-2">
+                                    <p><strong>ID:</strong> {{ item.transaction.id }}</p>
+                                    <p><strong>Amount:</strong> {{ item.transaction.amount }}</p>
+                                    <p><strong>Date:</strong> {{ item.transaction.date }}</p>
+                                </td>
+                                <td class="border px-4 py-2">{{ item.acquirer.name }}</td>
+                                <td class="border px-4 py-2">{{ item.refundable }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="px-4 py-2 text-center text-gray-600">No data available for the selected criteria.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Back to Dashboard Button -->
+            <div class="flex flex-col items-center mt-6">
+                <a href="{{ url_for('dashboard') }}" class="w-full px-4 py-2 text-white text-center bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -2,9 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>data.transaction.id</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100">
+
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-6xl p-8 space-y-6 bg-white rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-center text-gray-700">Transaction Details</h2>
+
+            <!-- Display Error Message if Exists -->
+            {% if error %}
+                <p class="text-red-500 text-center">{{ error }}</p>
+            {% endif %}
+
+            <!-- Check if transaction data exists -->
+            {% if data and data['transaction'] %}
+                <!-- FX Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">FX Information</h3>
+                    <p class="text-gray-700"><strong>Original Amount:</strong> {{ data['fx']['merchant']['originalAmount'] }} {{ data['fx']['merchant']['originalCurrency'] }}</p>
+                </div>
+
+                <!-- Customer Info Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Customer Information</h3>
+                    <p class="text-gray-700"><strong>ID:</strong> {{ data['customerInfo']['id'] }}</p>
+                    <p class="text-gray-700"><strong>Email:</strong> {{ data['customerInfo']['email'] }}</p>
+                    <p class="text-gray-700"><strong>Billing Address:</strong> {{ data['customerInfo']['billingAddress1'] }}, {{ data['customerInfo']['billingCity'] }}, {{ data['customerInfo']['billingCountry'] }}</p>
+                    <p class="text-gray-700"><strong>Shipping Address:</strong> {{ data['customerInfo']['shippingAddress1'] }}, {{ data['customerInfo']['shippingCity'] }}, {{ data['customerInfo']['shippingCountry'] }}</p>
+                </div>
+
+                <!-- Merchant Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Merchant Information</h3>
+                    <p class="text-gray-700"><strong>Merchant Name:</strong> {{ data['merchant']['name'] }}</p>
+                </div>
+
+                <!-- Transaction Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Transaction Information</h3>
+                    <p class="text-gray-700"><strong>Transaction ID:</strong> {{ data['transaction']['merchant']['transactionId'] }}</p>
+                    <p class="text-gray-700"><strong>Status:</strong> {{ data['transaction']['merchant']['status'] }}</p>
+                    <p class="text-gray-700"><strong>Reference Number:</strong> {{ data['transaction']['merchant']['referenceNo'] }}</p>
+                    <p class="text-gray-700"><strong>Operation:</strong> {{ data['transaction']['merchant']['operation'] }}</p>
+                    <p class="text-gray-700"><strong>Created At:</strong> {{ data['transaction']['merchant']['created_at'] }}</p>
+                    <p class="text-gray-700"><strong>Updated At:</strong> {{ data['transaction']['merchant']['updated_at'] }}</p>
+                </div>
+
+            {% else %}
+                <!-- No transaction data found -->
+                <p class="text-center text-gray-600">No transaction data found for the given ID.</p>
+            {% endif %}
+
+            <!-- Back to Dashboard Button -->
+            <div class="flex flex-col items-center mt-6">
+                <a href="{{ url_for('dashboard') }}" class="w-full px-4 py-2 text-white text-center bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
 
 </body>
-</html>+
+</html>
