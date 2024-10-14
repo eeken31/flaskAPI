@@ -3,53 +3,58 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from functools import wraps
 from urllib.parse import urlencode
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
+import os
 
 logging.basicConfig(level=logging.ERROR)
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"
+app.secret_key = os.getenv('SECRET_KEY', 'fallback-secret-key')
+
+# Set session lifetime to 10 minutes
+app.permanent_session_lifetime = timedelta(minutes=10)
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
 
 
-#no homepage
+# Render login page at index
 @app.route("/")
 @app.route("/index")
 def index():
 	return render_template("login.html")
 
 
-#login logic
+# Handle login and token storage in session
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-	if request.method == 'POST':
-		email = request.form['email']
-		password = request.form['password']
-		url = f"https://sandbox-reporting.rpdpymnt.com/api/v3/merchant/user/login?email={email}&password={password}"
-		response = requests.post(url,json={'email': email, 'password': password})
-		if response.status_code == 200:
-			token = response.json()['token']
-			session['token'] = token
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        url = f"https://sandbox-reporting.rpdpymnt.com/api/v3/merchant/user/login?email={email}&password={password}"
+        response = requests.post(url, json={'email': email, 'password': password})
 
-			# Set the session to expire in 10 minutes
-			session['expires_at'] = datetime.now() + timedelta(minutes=10)
+        if response.status_code == 200:
+            token = response.json()['token']
+            session['token'] = token  # Store the token in the session
+            session.permanent = True  # Mark the session as permanent
 
-			return redirect(url_for('dashboard'))
-		else:
-			flash("Invalid email or password")
-	return render_template('login.html')
+            return redirect(url_for('dashboard'))
+        else:
+            flash("Invalid email or password")
+
+    return render_template('login.html')
 
 
-#login requirement
+# Decorator to ensure the user is logged in with a valid token
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = session.get('token')
-        expires_at = session.get('expires_at')
 
-       	# Compare time for token expiration
-        if not token or not expires_at or datetime.now(timezone.utc) > expires_at:
+        if not token:
             flash("Your session has expired. Please log in again.")
-            session.clear()
             return redirect(url_for('login'))
 
         return f(*args, **kwargs)
@@ -64,7 +69,7 @@ def dashboard():
 
 
 
-#Transaction Report logic
+# Transaction Report - Fetch report data based on parameters
 @app.route("/report", methods=['GET', 'POST'])
 @login_required
 def report():
@@ -269,7 +274,7 @@ def client():
 		headers = {
 			'Authorization': token
 		}
-		# api call with different error handling, because of unauthorised credentials
+		# API call with limited credentials; handles API-specific errors
 		try:
 			response = requests.post(url, headers=headers)
 
@@ -297,12 +302,12 @@ def client():
 	return render_template("client.html")
 
 
-#Logout logic, clears session
+# Logout - Clear session and return to login
 @app.route('/logout')
 def logout():
-	session.clear()
-	flash("You have been logged out successfully.")
-	return redirect(url_for('login'))
+    session.clear()  # Clear the session on logout
+    flash("You have been logged out successfully.")
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
 	app.run(debug=True)
